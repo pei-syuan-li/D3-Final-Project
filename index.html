@@ -9,7 +9,7 @@
     <!--    <script src="http://d3js.org/topojson.v1.min.js"></script>-->
     <style>
         .all {
-            background: rgba(93, 185, 247, 0.53);
+            background: rgba(93, 185, 247, 0.63);
         }
         
         .map-boundary {
@@ -25,7 +25,7 @@
             /* rgba(255, 239, 0, 0.88); #f5f5f5 */
             width: auto;
             height: auto;
-            padding: 0px 10px;
+            padding: 10px;
             border-radius: 5px;
             box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
         }
@@ -37,19 +37,19 @@
         #hist.hidden {
             display: none;
         }
+        
         #tooltip div.hidden {
             display: none;
         }
-        
     </style>
 </head>
 
 <body>
     <div class=all>
-        <h2> D3.js Final Project--大專院校境外學生視覺化地圖 by Pei-Syuan Li</h2>
+        <h2> D3.js Project--大專院校境外學生視覺化地圖 by Pei-Syuan Li</h2>
         <div id="tooltip" class="hidden">
-            <p><strong id="coun">Country</strong></p>
-            <p id="tot">total</p>
+            <div><strong id="coun">Country</strong></div>
+            <div id="tot">total</div>
         </div>
 
         <svg width="1400" height="800"></svg>
@@ -149,7 +149,7 @@
             dataset.spec1 = trans(arr_spec);
 
             //console.log(dataset.dg_off1)
-                //1.地理資料檔: topoTaiwan.json
+            //1.地理資料檔: topoTaiwan.json
             d3.json("https://gist.githubusercontent.com/abenrob/787723ca91772591b47e/raw/8a7f176072d508218e120773943b595c998991be/world.json", function (topoData) {
                 //https://gist.githubusercontent.com/mbostock/4090846/raw/07e73f3c2d21558489604a0bc434b3a5cf41a867/world-110m.json
 
@@ -170,8 +170,8 @@
                 .domain([1, 5])
                 .range(['#ffebcc', '#ff9900']).clamp(true);
 
-            var w = 260;
-            var h = 220;
+            var w = 240;
+            var h = 150;
             var padd = 5;
             d3.select('#tooltip').append('svg').attr({
                 id: 'hist',
@@ -179,30 +179,30 @@
                 height: h,
                 class: 'hidden'
             })
-            d3.select('#tooltip').append('div').attr('class','hidden');
+            d3.select('#tooltip').append('div').attr('class', 'hidden').attr('id', 'cate');
 
             function H(cid) {
                 var k = dataset.id1.indexOf(cid);
 
                 var arr = [dataset.dg_off1[k], dataset.dg_oversea1[k], dataset.dg_ch1[k], dataset.ndg_exch1[k], dataset.ndg_short1[k], dataset.ndg_lang1[k], dataset.ndg_ch1[k], dataset.ndg_youth1[k], dataset.spec1[k]]
-                //console.log(arr)
+                    //console.log(arr)
 
                 var max = Math.max.apply(null, arr);
                 var arr2 = [];
                 var m;
-                if (max > 200) {
-                    n = max / 200;
+                if (max > 120) {
+                    n = max / 120;
                     for (var k = 0; k < arr.length; k++) {
                         arr2[k] = arr[k] / n;
                         m = n;
                     }
-                } else if (max > 100) {
+                } else if (max > 60) {
                     for (var k = 0; k < arr.length; k++) {
                         arr2[k] = arr[k] * 1;
                         m = 1;
                     }
 
-                } else if (max > 50) {
+                } else if (max > 30) {
                     for (var k = 0; k < arr.length; k++) {
                         arr2[k] = arr[k] * 2;
                         m = 0.5;
@@ -214,12 +214,10 @@
                     }
                 } else { //(max < 10)
                     for (var k = 0; k < arr.length; k++) {
-                        arr2[k] = arr[k] * 15;
-                        m = 1 / 15;
+                        arr2[k] = arr[k] * 10;
+                        m = 1 / 10;
                     }
                 }
-
-                //console.log(arr2)
 
                 var selection = d3.select("#hist").selectAll("rect").data(arr2);
                 selection.enter().append("rect");
@@ -236,7 +234,7 @@
                     height: function (d) {
                         return d;
                     },
-                    fill: 'rgb(255, 239, 0)'//'rgba(111, 93, 247, 0.92)'
+                    fill: 'rgb(255, 239, 0)' //'rgba(111, 93, 247, 0.92)'
                 });
 
                 // text number
@@ -245,12 +243,20 @@
                 selection2.exit().remove();
                 d3.select("#hist").selectAll('text').attr({
                     x: function (d, i) {
-                        return padd + 25 * i + 1;
+                        if ( d*m < 100) {
+                            return padd + 25 * i + 7;
+                        } 
+                        else if ( d*m > 1000) {
+                            return padd + 25 * i -3;
+                        } 
+                        else {
+                            return padd + 25 * i ;
+                        }
                     },
                     y: function (d) {
-                        return h - d - 7;
+                        return h - d - 4;
                     },
-                    fill: 'black'
+                    fill: 'rgb(68, 0, 255)'
                 }).text(function (d) {
                     return Math.round(d * m);
                 })
@@ -302,20 +308,22 @@
                     d3.select("#tot").text('境外學生人數: ' + dataset.total0[k]); //arr_total1[k]
 
                     H(cid);
-                    d3.select('#tooltip div').text('正式 僑生 陸生 交換 短期 華語 陸研 海青 專班');
-                    d3.selectAll('#tooltip div').style({
-                        'font-size': '11.5px', color:'black'
+                    d3.select('#tooltip div#cate').text('正式 僑生 陸生 交換 短期 華語 陸研 海青 專班');
+                    d3.selectAll('#tooltip div#cate').style({
+                        'font-size': '11.5px',
+                        "font-weight": "bold",
+                        color: 'black'
                     });
 
-                   d3.select("#hist").classed("hidden", false);
-                    d3.select("#tooltip div").classed("hidden", false);
+                    d3.select("#hist").classed("hidden", false);
+                    d3.select("#tooltip div#cate").classed("hidden", false);
 
                 } else {
                     d3.select("#coun").text('');
                     d3.select("#tot").text('境外學生人數: ' + 0);
                     d3.select("#hist").classed("hidden", true);
-                    
-                    d3.select("#tooltip div").classed("hidden", true);
+
+                    d3.select("#tooltip div#cate").classed("hidden", true);
                 }
 
                 d3.select("#tooltip").classed("hidden", false);
