@@ -146,7 +146,7 @@
             dataset.ndg_ch1 = trans(arr_ndg_ch);
             dataset.ndg_youth1 = trans(arr_ndg_youth);
             dataset.spec1 = trans(arr_spec);
-            //1.地理資料檔: topoTaiwan.json
+            // 地理資料檔
             d3.json("https://gist.githubusercontent.com/abenrob/787723ca91772591b47e/raw/8a7f176072d508218e120773943b595c998991be/world.json", function (topoData) {
                 bind(topoData, dataset);
                 render(dataset);
@@ -322,11 +322,11 @@
         var o_id = []; //topo檔國家的id
 
         function bind(topoData, dataset) {
-            // 2.地理投影器: 設定投影方式(麥卡托)、縮放(scale)
+            // 地理投影器: 設定投影方式(麥卡托)、縮放(scale)
             var projection = d3.geo.mercator().scale(140).translate([500, 400]);
-            // 3.路徑產生器: d3.geo.path()
+            // 路徑產生器: d3.geo.path()
             var path = d3.geo.path().projection(projection);
-            // 4.地理資料檔: 使用topojson.js載入地理資料
+            // 地理資料檔: 使用topojson.js載入地理資料
             var topo = topojson.feature(topoData, topoData.objects["countries"]);
             // 綁定path與載入的地理資料(features:每一地理區劃)
             var selection = d3.select("svg").selectAll("path").data(topo.features);
@@ -349,7 +349,7 @@
             selection.exit().remove();
             selection.classed("map-boundary", true).attr("d", path);
         }
-        //判定資料中的id是否有在地圖的內
+        // 判定資料中的id是否有在地圖的內
         Array.prototype.contains = function (element) {
             for (var i = 0; i < this.length; i++) {
                 if (this[i] == element) {
